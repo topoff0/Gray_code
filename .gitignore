@@ -1,0 +1,124 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# CMake
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps
+
+# Build directories
+build/
+Build/
+out/
+Out/
+bin/
+Bin/
+x64/
+x86/
+Debug/
+Release/
+MinSizeRel/
+RelWithDebInfo/
+*.dir/
+*.vcxproj
+*.vcxproj.filters
+*.sln
+*.suo
+*.opensdf
+*.sdf
+*.VC.db
+*.VC.opendb
+
+# IDE
+.vs/
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Documentation
+docs/html/
+docs/latex/
+doxygen/
+
+# Package management
+conaninfo.txt
+conanbuildinfo.*
+conan.lock
+
+# Coverage reports
+*.gcda
+*.gcno
+*.gcov
+
+# Profiling
+*.profraw
+*.profdata
+
+# Unit testing
+gtest/
+gmock/
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# Backup files
+*.bak
+*.backup
+
+# Project specific (adjust as needed)
+# config.h
+# local_config.h
+*.user
