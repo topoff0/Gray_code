@@ -30,8 +30,8 @@ public:
 
 Multiset ms_union(const Multiset &A, const Multiset &B);
 Multiset ms_intersection(const Multiset &A, const Multiset &B);
-Multiset ms_diff(const Multiset &A, const Multiset &B);
-Multiset ms_sym_diff(const Multiset &A, const Multiset &B);
+Multiset ms_diff(const Multiset &A, const Multiset &B, const Multiset &U);
+Multiset ms_sym_diff(const Multiset &A, const Multiset &, const Multiset &U);
 
 Multiset ms_complement(const Multiset &A, const Multiset &U);
 

@@ -5,7 +5,7 @@
 #define UI_MENU_LENGTH 40
 #define UI_LIST_LEFT_PADDING 2
 
-// === TEXT ===
+// === TEXT Format ===
 #define MAX_LINE_LENGTH 70
 
 // === CONSTANT WORDS ===

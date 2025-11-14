@@ -1,4 +1,0 @@
-/Users/vladimirkonotopov/Desktop/GitHubCloneRepositories/Gray_code/build/CMakeFiles/Lab.dir
-/Users/vladimirkonotopov/Desktop/GitHubCloneRepositories/Gray_code/build/CMakeFiles/leaks.dir
-/Users/vladimirkonotopov/Desktop/GitHubCloneRepositories/Gray_code/build/CMakeFiles/edit_cache.dir
-/Users/vladimirkonotopov/Desktop/GitHubCloneRepositories/Gray_code/build/CMakeFiles/rebuild_cache.dir

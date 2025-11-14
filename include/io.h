@@ -50,7 +50,7 @@ public:
     static void print(const string &s, COLOR clr = BASE);
     static void print_header(const string &s, HEADER_STYLE style = SIMPLE, COLOR clr = COLOR::CYAN);
     static void print_list(const vector<pair<string, COLOR>> &items, const string &header);
-    static void print_command_menu(const vector<pair<string, COLOR>> &items, const string &header);
+    static void print_command_menu(const vector<pair<string, COLOR>> &items, const vector<pair<string, COLOR>> &exit_items, const string &header);
     static void print_retry(const string &s, COLOR clr = BASE);
 
     static void print_text_with_header(const string &text,

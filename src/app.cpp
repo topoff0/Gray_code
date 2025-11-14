@@ -5,9 +5,28 @@
 #include "graycode.h"
 #include "info.h"
 
+const std::vector<std::pair<std::string, COLOR>> app::main_menu_items = {
+    {"Начать работу", BASE},
+    {"Инструкция", BASE},
+    {"О коде Грея", BASE}};
+
+const std::vector<std::pair<std::string, COLOR>> app::main_menu_exit_items = {
+    {"Завершить работу", RED}};
+
+const std::vector<std::pair<std::string, COLOR>> app::exit_items = {
+    {"Вернуться в главное меню", RED},
+    {"Завершить работу", RED}};
+
+const std::vector<std::pair<std::string, COLOR>> app::multiset_creation_items = {
+    {"Создать мультимножество A автоматически", BASE},
+    {"Создать мультимножество A вручную", BASE},
+    {"Создать мультимножество B автоматически", BASE},
+    {"Создать мультимножество B вручную", BASE},
+    {"Продолжить", GREEN}};
+
 const std::vector<std::pair<std::string, COLOR>> app::operation_items = {
-    {"Объединение (A ∪ B)>", BLUE},
-    {"Пересечение (A ∩ B)>", BLUE},
+    {"Объединение (A ∪ B)", BLUE},
+    {"Пересечение (A ∩ B)", BLUE},
     {"Разность (A \\ B)", BLUE},
     {"Разность (B \\ A)", BLUE},
     {"Симметрическая разность (A Δ B)", BLUE},
@@ -17,22 +36,16 @@ const std::vector<std::pair<std::string, COLOR>> app::operation_items = {
     {"Арифметическая разность (A ⊖ B)", YELLOW},
     {"Арифметическая разность (B ⊖ A)", YELLOW},
     {"Арифметическое произведение (A ⊗ B)", YELLOW},
-    {"Арифметическое деление (A/B)", YELLOW},
-    {"Арифметическое деление (B/A)", YELLOW}};
+    {"Арифметическое деление (A / B)", YELLOW},
+    {"Арифметическое деление (B / A)", YELLOW}};
 
-const std::vector<std::pair<std::string, COLOR>> app::main_menu_items = {
-    {"Начать работу", BASE},
-    {"Инструкция", BASE},
-    {"О коде Грея", BASE}};
-
-const std::vector<std::pair<std::string, COLOR>> app::multiset_creation_items = {
-    {"Создать мультимножество A автоматически", BASE},
-    {"Создать мультимножество A вручную", BASE},
-    {"Создать мультимножество B автоматически", BASE},
-    {"Создать мультимножество B вручную", BASE},
+const std::vector<std::pair<std::string, COLOR>> app::universe_creation_items = {
+    {"Заполнить универсум автоматически", BASE},
+    {"Заполнить универсум вручную", BASE},
     {"Продолжить", GREEN}};
 
 bool app::_running = true;
+bool app::_back = false;
 
 void app::process_main_menu(const int choice)
 {
@@ -64,6 +77,11 @@ void app::process_operation(const int choice,
 {
     switch (choice)
     {
+    case -1:
+    {
+        _back = true;
+        break;
+    }
     case 0:
         _running = false;
         break;
@@ -74,13 +92,13 @@ void app::process_operation(const int choice,
         app::Operations::Set::execute_intersection(A, B, "Пересечение мультимножеств A и B", universe);
         break;
     case 3:
-        app::Operations::Set::execute_difference(A, B, "Разность мультимножеств A и B", universe);
+        app::Operations::Set::execute_difference(A, B, U, "Разность мультимножеств A и B", universe);
         break;
     case 4:
-        app::Operations::Set::execute_difference(B, A, "Разность мультимножеств B и A", universe);
+        app::Operations::Set::execute_difference(B, A, U, "Разность мультимножеств B и A", universe);
         break;
     case 5:
-        app::Operations::Set::execute_symmetric_difference(A, B, "Симметрическая разность A и B", universe);
+        app::Operations::Set::execute_symmetric_difference(A, B, U, "Симметрическая разность A и B", universe);
         break;
     case 6:
         app::Operations::Set::execute_complement(A, U, "Дополнение А", universe);
@@ -112,6 +130,52 @@ void app::process_operation(const int choice,
     }
 }
 
+void app::process_universe_creation(const int choice, Multiset &U, vector<string> &universe, bool &stop_creation)
+{
+    switch (choice)
+    {
+    case -1:
+    {
+        stop_creation = true;
+        _back = true;
+        return;
+    }
+    case 1:
+    {
+        U.fill_auto();
+        break;
+    }
+    case 2:
+    {
+        size_t size = U.get_size();
+        Multiset MAX(size);
+        vector<long long> values(size, MULTISET_MAX_CARDINALITY);
+        MAX.fill_manual(values);
+        app::fill_multiset_manual(U, MAX, universe);
+        break;
+    }
+    case 3:
+    {
+        if (U.is_initialized())
+            stop_creation = true;
+        else
+        {
+            string error_message = "Универсум не инициализирован";
+
+            io::print_error(error_message);
+            io::wait_enter();
+        }
+        return;
+    }
+
+    default:
+        return;
+    }
+    io::print_header("Универсум успешно создан", BOXED, GREEN);
+    io::print_multiset(U, "Универсум", universe);
+    io::wait_enter();
+}
+
 void app::process_multiset_creation(const int choice,
                                     Multiset &A,
                                     Multiset &B,
@@ -121,6 +185,12 @@ void app::process_multiset_creation(const int choice,
 {
     switch (choice)
     {
+    case -1:
+    {
+        stop_creation = true;
+        _back = true;
+        break;
+    }
     case 0:
         stop_creation = true;
         _running = false;
@@ -191,10 +261,13 @@ void app::fill_multiset_manual(Multiset &M, const Multiset &U, vector<string> &u
 {
     vector<long long> values;
     size_t size = M.get_size();
+    if (size == 0)
+    {
+        M.fill_auto_base_on_universe(U);
+        return;
+    }
 
-    io::print_header("Ручное заполнение мультимножества", BOXED);
-    io::print_multiset(U, "Универсум", universe);
-
+    io::print_header("Ручное заполнение мультимножества", BOLD);
     io::print_header("Введите мощности для каждого элемента", BOXED);
 
     for (size_t i = 0; i < size; i++)
@@ -216,8 +289,9 @@ void app::run()
 
     while (_running)
     {
-        main_menu.show(main_menu_items, "Список команд");
-        int choice = io::read_number(0, main_menu_items.size(), "Введите номер команды");
+        _back = false;
+        main_menu.show(main_menu_items, main_menu_exit_items, "Список команд");
+        int choice = io::read_number(-(main_menu_exit_items.size() - 1), main_menu_items.size(), "Введите номер команды");
         process_main_menu(choice);
     }
     io::print_header("Программа завершила свою работу", BOLD, GREEN);
@@ -226,39 +300,42 @@ void app::run()
 void app::MainMenu::start()
 {
     io::print_header("СОЗДАНИЕ УНИВЕРСУМА", HEADER_STYLE::BOXED, CYAN);
-    string input_prompt = "Введите разрядность кода Грея (1-" + std::to_string(MULTISET_MAX_BIT_DEPTH) + string(")");
-    unsigned int bits = static_cast<unsigned int>(io::read_number(1, MULTISET_MAX_BIT_DEPTH, input_prompt));
+    string input_prompt = "Введите разрядность кода Грея (0-" + std::to_string(MULTISET_MAX_BIT_DEPTH) + string(")");
+    unsigned int bits = static_cast<unsigned int>(io::read_number(0, MULTISET_MAX_BIT_DEPTH, input_prompt));
 
-    // Создание универсума
     vector<string> gray_universe = generate_gray_universe(bits);
 
-    Multiset U(1 << bits);
-    U.fill_auto();
-
-    io::print_header("Универсум успешно создан", BOXED, GREEN);
-    io::print_multiset(U, "Универсум", gray_universe);
-    io::wait_enter();
+    // Меню создания универсума
+    Multiset U(bits != 0 ? 1 << bits : 0);
+    bool stop_universe_creation = false;
+    while (!stop_universe_creation && !_back)
+    {
+        Menu create_multiset_menu("Меню создания универсума");
+        create_multiset_menu.show(universe_creation_items, exit_items, "Список команд", BOXED);
+        int choice = io::read_number(-(exit_items.size() - 1), universe_creation_items.size(), "Введите номер команды");
+        app::process_universe_creation(choice, U, gray_universe, stop_universe_creation);
+    }
 
     // Меню заполнения мультимножеств
-    Multiset A(1 << bits), B(1 << bits);
+    Multiset A(bits != 0 ? 1 << bits : 0), B(bits != 0 ? 1 << bits : 0);
 
-    bool stop_creation = false;
-    while (!stop_creation)
+    bool stop_multiset_creation = false;
+    while (!stop_multiset_creation && !_back)
     {
         Menu multiset_menu("Меню создания мультимножеств");
-        multiset_menu.show(multiset_creation_items, "Список команд");
+        multiset_menu.show(multiset_creation_items, exit_items, "Список команд");
 
-        int choice = io::read_number(0, multiset_creation_items.size(), "Введите номер команды");
-        process_multiset_creation(choice, A, B, U, gray_universe, stop_creation);
+        int choice = io::read_number(-(exit_items.size() - 1), multiset_creation_items.size(), "Введите номер команды");
+        process_multiset_creation(choice, A, B, U, gray_universe, stop_multiset_creation);
     }
 
     // Меню операций над мультимножествами
     Menu operations_menu("Меню операций над мультимножествами");
-    while (_running)
+    while (_running && !_back)
     {
-        operations_menu.show(operation_items, "Список операций");
+        operations_menu.show(operation_items, exit_items, "Список операций");
 
-        int choice = io::read_number(0, operation_items.size(), "Введите номер операции");
+        int choice = io::read_number(-(exit_items.size() - 1), operation_items.size(), "Введите номер операции");
         process_operation(choice, A, B, U, gray_universe);
     }
 }
@@ -301,18 +378,18 @@ void app::Operations::Set::execute_intersection(const Multiset &A, const Multise
     io::wait_enter();
 }
 
-void app::Operations::Set::execute_difference(const Multiset &A, const Multiset &B, const string &header, const vector<string> &universe)
+void app::Operations::Set::execute_difference(const Multiset &A, const Multiset &B, const Multiset &U, const string &header, const vector<string> &universe)
 {
     io::print_header(header, BOXED);
-    Multiset R = ms_diff(A, B);
+    Multiset R = ms_diff(A, B, U);
     io::print_multiset(R, "Результат разности", universe);
     io::wait_enter();
 }
 
-void app::Operations::Set::execute_symmetric_difference(const Multiset &A, const Multiset &B, const string &header, const vector<string> &universe)
+void app::Operations::Set::execute_symmetric_difference(const Multiset &A, const Multiset &B, const Multiset &U, const string &header, const vector<string> &universe)
 {
     io::print_header(header, BOXED);
-    Multiset R = ms_sym_diff(A, B);
+    Multiset R = ms_sym_diff(A, B, U);
     io::print_multiset(R, "Результат симметрической разности", universe);
     io::wait_enter();
 }

@@ -51,13 +51,13 @@ bool Multiset::is_initialized()
 
 long long &Multiset::operator[](size_t index)
 {
-    if (index < 0 || index > this->get_size())
+    if (index > this->get_size())
         throw std::out_of_range("Индекс мультимножества вне диапазона");
     return counts[index];
 }
 const long long &Multiset::operator[](size_t index) const
 {
-    if (index < 0 || index > this->get_size())
+    if (index > this->get_size())
         throw std::out_of_range("Индекс мультимножества вне диапазона");
     return counts[index];
 }
@@ -86,28 +86,22 @@ Multiset ms_intersection(const Multiset &A, const Multiset &B)
     return R;
 }
 
-Multiset ms_diff(const Multiset &A, const Multiset &B)
+Multiset ms_diff(const Multiset &A, const Multiset &B, const Multiset &U)
 {
-    int n = A.get_size();
-    Multiset R(n);
-
-    for (int i = 0; i < n; i++)
-    {
-        R[i] = max(0LL, A[i] - B[i]);
-    }
-    return R;
+    return ms_intersection(A, ms_complement(B, U));
 }
 
-Multiset ms_sym_diff(const Multiset &A, const Multiset &B)
+Multiset ms_sym_diff(const Multiset &A, const Multiset &B, const Multiset &U)
 {
-    int n = A.get_size();
-    Multiset R(n);
+    // int n = A.get_size();
+    // Multiset R(n);
 
-    for (int i = 0; i < n; i++)
-    {
-        R[i] = llabs(A[i] - B[i]);
-    }
-    return R;
+    // for (int i = 0; i < n; i++)
+    // {
+    //     R[i] = llabs(A[i] - B[i]);
+    // }
+    // return R;
+    return ms_diff(ms_union(A, B), ms_intersection(A, B), U);
 }
 
 Multiset ms_complement(const Multiset &A, const Multiset &U)
@@ -136,7 +130,14 @@ Multiset ms_arith_sum(const Multiset &A, const Multiset &B, const Multiset &U)
 
 Multiset ms_arith_diff(const Multiset &A, const Multiset &B)
 {
-    return ms_diff(A, B);
+    int n = A.get_size();
+    Multiset R(n);
+
+    for (int i = 0; i < n; i++)
+    {
+        R[i] = max(0LL, A[i] - B[i]);
+    }
+    return R;
 }
 
 Multiset ms_prod(const Multiset &A, const Multiset &B, const Multiset &U)

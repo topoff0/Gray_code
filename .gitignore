@@ -1,11 +1,14 @@
 # Prerequisites
 *.d
 
-# Compiled Object files
-*.slo
-*.lo
+# Compiled files
 *.o
 *.obj
+*.exe
+*.dll
+*.so
+*.a
+*.lib
 
 # Precompiled Headers
 *.gch
@@ -122,3 +125,5 @@ gmock/
 # config.h
 # local_config.h
 *.user
+
+отчет/

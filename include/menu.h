@@ -9,5 +9,5 @@ private:
 public:
     Menu(const string &h) : header(h) {}
 
-    void show(vector<pair<string, COLOR>> menu_items, const string &list_header, HEADER_STYLE style = BOLD);
+    void show(const vector<pair<string, COLOR>> menu_items, const vector<pair<string, COLOR>> exit_items, const string &list_header, HEADER_STYLE style = BOLD);
 };

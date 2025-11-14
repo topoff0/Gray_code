@@ -136,7 +136,9 @@ void io::print_header(const string &s, HEADER_STYLE style, COLOR clr)
 
 void io::print_list(const vector<pair<string, COLOR>> &items, const string &header)
 {
-    int width = UI_MENU_LENGTH;
+    int len = helpers::count_visible_chars(header);
+    int width = UI_MENU_LENGTH > len ? UI_MENU_LENGTH : len + 2;
+
     for (const auto &item : items)
     {
         int visible_len = helpers::count_visible_chars(item.first) + 10;
@@ -146,7 +148,6 @@ void io::print_list(const vector<pair<string, COLOR>> &items, const string &head
         }
     }
 
-    int len = helpers::count_visible_chars(header);
     int padding_left = (width - len) / 2;
     int padding_right = width - len - padding_left;
     string outer_padding((UI_HEADER_LENGTH - width) / 2, ' ');
@@ -173,7 +174,7 @@ void io::print_list(const vector<pair<string, COLOR>> &items, const string &head
     cout << reset_color;
 }
 
-void io::print_command_menu(const vector<pair<string, COLOR>> &items, const string &header)
+void io::print_command_menu(const vector<pair<string, COLOR>> &items, const vector<pair<string, COLOR>> &exit_items, const string &header)
 {
 
     int width = UI_MENU_LENGTH;
@@ -206,12 +207,22 @@ void io::print_command_menu(const vector<pair<string, COLOR>> &items, const stri
         int item_padding_left = UI_LIST_LEFT_PADDING;
         int item_padding_right = width - visible_item_len - UI_LIST_LEFT_PADDING - 1;
 
-        cout << outer_padding << "│" << get_color_code(BLUE) << string(item_padding_left, ' ') << get_color_code(items[i].second)
+        cout << outer_padding << "│" << get_color_code(items[i].second) << string(item_padding_left, ' ') << get_color_code(items[i].second)
              << menu_item << string(item_padding_right, ' ') << get_color_code(CYAN) << " │" << endl;
     }
-
+    // Exit items
     cout << outer_padding << "├" << border << "┤" << endl;
-    cout << outer_padding << "│ " << get_color_code(RED) << " 0. Выход" << string(width - 11, ' ') << get_color_code(CYAN) << " │" << endl;
+    int size = exit_items.size();
+    for (int i = 0; i < size; i++)
+    {
+        string menu_item = (i - size + 1 < 0 ? "" : " ") + std::to_string(i - size + 1) + ". " + exit_items[i].first;
+        int visible_item_len = helpers::count_visible_chars(menu_item);
+        int item_padding_left = UI_LIST_LEFT_PADDING;
+        int item_padding_right = width - visible_item_len - UI_LIST_LEFT_PADDING - 1;
+
+        cout << outer_padding << "│" << string(item_padding_left, ' ') << get_color_code(exit_items[i].second)
+             << menu_item << string(item_padding_right, ' ') << get_color_code(CYAN) << " │" << endl;
+    }
     cout << outer_padding << "╰" << border << "╯" << endl;
     cout << reset_color;
 }
@@ -273,16 +284,26 @@ void io::print_text_with_header(const string &text, const string &header, const 
 
 void io::print_multiset(const Multiset &M, const string &header, const vector<string> &universe, COLOR clr)
 {
+    size_t size = M.get_size();
     vector<pair<string, COLOR>> output_list;
-    vector<long long> multiset_cardinalities = M.get_cardinalities();
-    for (size_t i = 0; i < M.get_size(); i++)
+    string new_header = header;
+
+    if (size == 0)
     {
-        string cardinality = std::to_string(M[i]);
-        int padding = std::to_string(MULTISET_MAX_CARDINALITY).length() - cardinality.length();
-        string s = universe[i] + " :" + string(padding, ' ') + cardinality;
-        output_list.push_back(pair(s, clr));
+        new_header += " (пустое множество)";
     }
-    print_list(output_list, header);
+    else
+    {
+        vector<long long> multiset_cardinalities = M.get_cardinalities();
+        for (size_t i = 0; i < size; i++)
+        {
+            string cardinality = std::to_string(M[i]);
+            int padding = std::to_string(MULTISET_MAX_CARDINALITY).length() - cardinality.length();
+            string s = universe[i] + " :" + string(padding, ' ') + cardinality;
+            output_list.push_back(pair(s, clr));
+        }
+    }
+    print_list(output_list, new_header);
 }
 
 void io::print_error(const string &message, COLOR clr)

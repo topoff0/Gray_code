@@ -4,11 +4,15 @@
 class app
 {
 private:
-    static const vector<pair<string, COLOR>> operation_items;
     static const vector<pair<string, COLOR>> main_menu_items;
+    static const vector<pair<string, COLOR>> main_menu_exit_items;
+    static const vector<pair<string, COLOR>> exit_items;
+    static const vector<pair<string, COLOR>> universe_creation_items;
     static const vector<pair<string, COLOR>> multiset_creation_items;
+    static const vector<pair<string, COLOR>> operation_items;
 
     static bool _running;
+    static bool _back;
 
     // === Process commands ===
     static void process_main_menu(const int choice);
@@ -17,6 +21,10 @@ private:
                                   const Multiset &B,
                                   const Multiset &U,
                                   vector<string> universe);
+    static void process_universe_creation(const int choice,
+                                          Multiset &U,
+                                          vector<string> &universe,
+                                          bool &stop_creation);
     static void process_multiset_creation(const int choice,
                                           Multiset &A, Multiset &B,
                                           const Multiset &U,
@@ -42,8 +50,8 @@ private:
         public:
             static void execute_union(const Multiset &A, const Multiset &B, const string &header, const vector<string> &universe);
             static void execute_intersection(const Multiset &A, const Multiset &B, const string &header, const vector<string> &universe);
-            static void execute_difference(const Multiset &A, const Multiset &B, const string &header, const vector<string> &universe);
-            static void execute_symmetric_difference(const Multiset &A, const Multiset &B, const string &header, const vector<string> &universe);
+            static void execute_difference(const Multiset &A, const Multiset &B, const Multiset &U, const string &header, const vector<string> &universe);
+            static void execute_symmetric_difference(const Multiset &A, const Multiset &B, const Multiset &U, const string &header, const vector<string> &universe);
             static void execute_complement(const Multiset &M, const Multiset &U, const string &header, const vector<string> &universe);
         };
         class Arithmetic
